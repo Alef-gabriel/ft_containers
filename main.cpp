@@ -1,192 +1,140 @@
 #include <iostream>
-#include <string>
-#include <vector>
-#include <numeric>
-#include <algorithm>
-#include <cstdio>
-#include "FtVector.hpp"
+#include <cstdlib>
 
-// int main() {
-//     ft::Vector<int> bg;
-//     std::vector<int> tt;
-//     printf("hello");
-//     bg.push_back(5);
-//     //bg.pop_back();
-//     bg.push_back(8);
-//     bg.at(1) = 20;
-//     std::cout << bg[0] << " " << bg[1] << " " << bg[2] << '\n';
-//     return 0;
-// }
+struct node {
+    int   value;
+    node* right;
+    node* left;
+    int color;
+    node* parent;
+};
 
-void reserve()
-{
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-    myVec.push_back(5);
-    myVec.push_back(8);
-
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-
-    std::cout << sizeof(defaultVec) << " " << sizeof(myVec) << '\n';
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
-    defaultVec.reserve(120);
-    myVec.reserve(120);
-    std::cout << "\n******** AFTER OF RESERVE ********" << '\n';
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
+node* createNodo(int value, int color, node *parent) {
+    node* var = (node *)malloc(sizeof(node));
+    var->left = NULL;
+    var->right = NULL;
+    var->value = value;
+    var->color = color;
+    var->parent = parent;
+    return var;
 }
 
-void shrink_to_fit()
-{
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-    myVec.push_back(5);
-    myVec.push_back(8);
-
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-
-    defaultVec.reserve(120);
-    myVec.reserve(120);
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
-
-    defaultVec.shrink_to_fit();
-    myVec.shrink_to_fit();
-    std::cout << "\n******** AFTER OF SHRINK_TO_FIT ********" << '\n';
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
+void rightRotate(node* &S) {
+    node *P = S->parent != NULL ? S->parent->right : NULL;
+    if (P) {
+        S->parent->right = S->right;
+    }
+    node *t = S->parent;
+    P = S->right;
+    S->right->right = S;
+    S->right->parent = S->parent;
+    S = P;
+    S->color = 0;
+    S->right->color = 1;
+    S->right->parent = S;
+    S->right->right = NULL;
+    S->parent = t;
 }
 
-void inserte()
-{
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-
-    myVec.push_back(5);
-    myVec.push_back(8);
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-    // using begin() to print vector
-    myVec.insert(myVec.begin() + 6, 33);
-    defaultVec.insert(defaultVec.begin() + 6, 33);
-    std::cout << "\n******** ALL ELEMENTES IN MY VECTOR ********" << '\n';
-    for (auto it = myVec.begin();
-         it != myVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
-    std::cout << "\n******** ALL ELEMENTES IN DEFAULT VECTOR ********" << '\n';
-    for (auto it = defaultVec.begin();
-         it != defaultVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
-
-    std::cout << defaultVec[6] << '\n';
-    std::cout << myVec[6] << '\n';
+void leftRotate(node* &S) {
+    node *P = S->parent != NULL ? S->parent->left : NULL;
+    if (P) {
+        S->parent->left = S->left;
+    }
+    node *t = S->parent;
+    P = S->left;
+    S->left->right = S;
+    S->left->parent = S->parent;
+    S = P;
+    S->color = 0;
+    S->right->color = 1;
+    S->right->parent = S;
+    S->right->left = NULL;
+    S->parent = t;
 }
 
-void pop_back() {
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-    myVec.push_back(5);
-    myVec.push_back(8);
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-    defaultVec.pop_back();
-    myVec.pop_back();
-
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
-    std::cout << defaultVec[1] << '\n';
-    std::cout << myVec[1] << '\n';
+void invertColor(node* H) {
+    H->color = !H->color;
+    if (H->left)
+        H->left->color = !H->left->color;
+    if (H->right)
+        H->right->color = !H->right->color;
 }
 
-void erase() {
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-    myVec.push_back(5);
-    myVec.push_back(8);
-    myVec.push_back(15);
-    myVec.push_back(18);
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-    defaultVec.push_back(15);
-    defaultVec.push_back(18);
-    
-    defaultVec.erase(defaultVec.begin() + 1);
-    myVec.erase(myVec.begin() + 1);
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
+node* rebalance(node* &H) {
 
-    for (auto it = myVec.begin();
-         it != myVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
-    for (auto it = defaultVec.begin();
-         it != defaultVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
+    node* S = H;
+
+    while (H != NULL)
+    {
+        if (H->left != NULL && H->left->color == 1 && H->left->left && H->left->left->color == 1 && H->right && H->right->color == 1) {
+            invertColor(H);
+        }
+        else if (H->right != NULL && H->color == 1 && H->right->color == 1) {
+            rightRotate(H->parent);
+            if (!H->parent) {
+                S = H;
+            }
+        }
+        else if (H->left != NULL && H->left->color == 1 && H->color == 1) {
+            leftRotate(H->parent);
+            if (!H->parent) {
+                S = H;
+            }
+        }
+        if (H->left) {
+            H = H->left;
+        }
+        else {
+            H = H->right;
+        }
+    }
+    return S;
 }
 
-void resize() {
-    ft::vector<int> myVec;
-    std::vector<int> defaultVec;
-    myVec.push_back(5);
-    myVec.push_back(8);
-    myVec.push_back(15);
-    myVec.push_back(18);
-    defaultVec.push_back(5);
-    defaultVec.push_back(8);
-    defaultVec.push_back(15);
-    defaultVec.push_back(18);
-    // using begin() to print vector
-    
-    defaultVec.resize(1);
-    myVec.resize(1);
-    std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
 
-    for (auto it = myVec.begin();
-         it != myVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
-    for (auto it = defaultVec.begin();
-         it != defaultVec.end(); ++it)
-        std::cout << ' ' << *it;
-    std::cout << '\n';
+void insert(node* &data, node *parent, int value) {
+    if (data) {
+        if (data->value == value) {
+            return ;
+        }
+        if (value > data->value) {
+            insert(data->right, data, value);
+        }
+        else {
+            insert(data->left, data, value);
+        }
+    }
+    else {
+        data = createNodo(value, 1, parent);
+    }
 }
 
-int main()
-{
-    // declaration of vector container
-    ft::vector<int> myVec = {1, 1, 3};
-    ft::vector<int> defaultVec{4, 5 , 6};
-    // myVec.push_back(5);
-    // myVec.push_back(8);
-    // myVec.push_back(15);
-    // myVec.push_back(18);
-    // defaultVec.push_back(5);
-    // defaultVec.push_back(8);
-    // defaultVec.push_back(15);
-    // defaultVec.push_back(18);
-    // using begin() to print vector
-    
-    if (myVec == defaultVec)
-        std::cout << "flase" << '\n';
-    // std::cout << "Default vector capacity: " << defaultVec.capacity() << " Default vector size: " << defaultVec.size() << '\n';
-    // std::cout << "my vector capacity: " << myVec.capacity() << " my vector size: " << myVec.size() << '\n';
+node *newNo(node *H, int value) {
+    node *tree = H;
 
-    // for (auto it = myVec.begin();
-    //      it != myVec.end(); ++it)
-    //     std::cout << ' ' << *it;
-    // std::cout << '\n';
-    // for (auto it = defaultVec.begin();
-    //      it != defaultVec.end(); ++it)
-    //     std::cout << ' ' << *it;
-    // std::cout << '\n';
+    insert(tree, NULL, value);
+    tree->color = 0;
+    tree = rebalance(tree);
+    tree->color = 0;
+    return tree;
+}
+
+int main() {
+    node *tree = NULL;
+
+    tree = newNo(tree, 100);
+    tree = newNo(tree, 50);
+    tree = newNo(tree, 40);
+    tree = newNo(tree, 20);
+    tree = newNo(tree, 10);
+    tree = newNo(tree, 8);
+    tree = newNo(tree, 5);
+
+    // insert(tree, NULL, 100);
+    // insert(tree, NULL, 50);
+    // insert(tree, NULL, 40);
+    // insert(tree, NULL, 20);
+    // insert(tree, NULL, 10);
     return 0;
 }

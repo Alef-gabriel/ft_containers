@@ -1,5 +1,5 @@
-#ifndef FtVECTOR_HPP
-#define FtVECTOR_HPP
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 #include <iostream>
 #include <initializer_list>
 #include <memory>

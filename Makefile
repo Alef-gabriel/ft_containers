@@ -1,9 +1,9 @@
 NAME    = teste
 
 CC      = c++
-CFLAGS    = -Wall -Wextra  -std=c++98
+CFLAGS    = -g -Wall -Wextra  -std=c++98
 INCLUDE =    -I ./
-HEADERS    = FtVector.hpp
+HEADERS    = 
 
 SRC        = main.cpp
 
@@ -16,7 +16,6 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
-	./$(NAME)
 
 clean:
 	rm -rf $(OBJ)

@@ -35,7 +35,6 @@ public:
         }
     }
 
-
     void insert(int value) {
         if (root) {
             while (root) {
@@ -71,20 +70,26 @@ public:
         }
     }
 
-    node *search(node *tree, int value) {
+    int search(int value) {
+        node *tree = root;
+        int res = -1;
+
         if (tree) {
-            if (value > tree->value) {
-                tree = tree->left;
-            }
-            else {
-                if (value == tree->value) {
-                    return tree;
+            while (tree)
+            {
+                if (value > tree->value) {
+                    tree = tree->right;
                 }
-                tree = tree->right;
-            }
-            search(tree, value);
+                else {
+                    if (value == tree->value) {
+                        res = value;
+                        break ;
+                    }
+                    tree = tree->left;
+                }
+            }   
         }
-        return NULL;
+        return res;
     }
 
 private:
@@ -132,15 +137,15 @@ private:
                 P->left = S;
             }
         }
-        node *T = S->left;
+        node *T = S->right;
         if (T) {
             T->parent = S->parent;
         }
-        S->left = S->parent;
-        S->left->right = T;
-        S->left->parent = S;
+        S->right = S->parent;
+        S->right->parent = S;
         S->left->color = 1;
         S->right->color = 1;
+        S->right->left = T;
         S->parent = P;
     }
 

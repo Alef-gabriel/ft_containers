@@ -1,7 +1,7 @@
 NAME    = teste
 
 CC      = c++
-CFLAGS    = -g -Wall -Wextra  -std=c++98
+CFLAGS    = -g -Wall -Wextra
 INCLUDE =    -I ./
 HEADERS    = 
 

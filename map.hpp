@@ -92,6 +92,27 @@ public:
         return res;
     }
 
+    int remove(int value) {
+        node *tree = root;
+        while (tree)
+        {
+            if (value > tree->value) {
+                tree = tree->right;
+            }
+            else {
+                if (value == tree->value) {
+                    node *u = tree;
+                    tree = tree->right;
+                    transplant(u, tree);
+                    delete_fixup(tree);
+                    return 1;
+                }
+                tree = tree->left;
+            }
+        }
+        return 0;
+    }
+
 private:
     node* root;
 
@@ -124,6 +145,7 @@ private:
         S->left->parent = S;
         S->left->color = 1;
         S->right->color = 1;
+        S->color = 0;
         S->parent = P;
     }
 
@@ -146,6 +168,7 @@ private:
         S->left->color = 1;
         S->right->color = 1;
         S->right->left = T;
+        S->color = 0;
         S->parent = P;
     }
 
@@ -155,6 +178,49 @@ private:
             H->left->color = !H->left->color;
         if (H->right)
             H->right->color = !H->right->color;
+    }
+
+    void transplant(node *u, node* &v) {
+        if (u->parent == NULL) {
+            root = v;
+        }
+        else if (u == u->parent->left) {
+            u->parent->left = v;
+        }
+        else {
+            u->parent->right = v;
+        }
+        v->parent = u->parent;
+    }
+
+    void delete_fixup(node *X) {
+        while (X != root && X->color == 0) {
+            node *W = X->parent->right;
+            if (X == X->parent->left) {
+                W->color = 0;
+                X->parent->color = 1;
+                leftRotate(X->parent);
+                W = X->parent->right;
+            }
+            if (W->left->color == 0 && W->right->color == 0) {
+                W->color = 1;
+                X = X->parent;
+            }
+            else { 
+                if (W->right->color == 0) {
+                    W->left->color = 0;
+                    W->color = 1;
+                    rightRotate(W);
+                    W = X->parent->right;
+                }
+                W->color = X->parent->color;
+                X->parent->color = 0;
+                W->right->color = 0;
+                leftRotate(X->parent);
+                X = root; 
+            }
+        } 
+        X->color = 0;
     }
 };
 }

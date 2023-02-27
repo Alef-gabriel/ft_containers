@@ -17,10 +17,14 @@ int main() {
     std::cout << "Value : " << value << " " << "Execution time: " << duration.count() << " microseconds" << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
-    for(int i = 3000; i > 1; i--) {
+    for(int i = 1; i < 9; i++) {
         newmap.insert(i);
     }
-    value = newmap.search(1000);
+    value = newmap.search(2);
+    newmap.remove(7);
+    value = newmap.search(7);
+    newmap.remove(4);
+    value = newmap.search(4);
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "Value : " << value << " " << "Execution time: " << duration.count() << " microseconds" << std::endl;

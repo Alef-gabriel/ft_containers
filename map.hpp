@@ -102,7 +102,21 @@ public:
             else {
                 if (value == tree->value) {
                     node *u = tree;
-                    tree = tree->right;
+                    if (tree->parent == NULL || tree->parent->left == u) {
+                        tree = tree->left;
+                        if (tree->right) {
+                            while (tree->right) {
+                                tree = tree->right;
+                            }
+                            tree->parent->right = NULL;
+                        }
+                        else {
+                            tree->parent->left = NULL;
+                        }
+                    }
+                    else {
+                        tree = tree->right;
+                    }
                     transplant(u, tree);
                     delete_fixup(tree);
                     return 1;
@@ -149,8 +163,8 @@ private:
         S->parent = P;
     }
 
-    void leftRotate(node* &S) {
-        node *P = S->parent->parent != NULL ? S->parent->parent : NULL;
+    void leftRotate(node* S) {
+        node *P = S->parent != NULL ? S->parent->parent : NULL;
         if (P) {
             if (P->right == S->parent) {
                 P->right = S;
@@ -183,9 +197,13 @@ private:
     void transplant(node *u, node* &v) {
         if (u->parent == NULL) {
             root = v;
+            root->right = u->right;
+            root->left = u->left;
         }
         else if (u == u->parent->left) {
             u->parent->left = v;
+            v->left = u->left;
+            v->right = u->right;
         }
         else {
             u->parent->right = v;
@@ -196,10 +214,9 @@ private:
     void delete_fixup(node *X) {
         while (X != root && X->color == 0) {
             node *W = X->parent->right;
-            if (X == X->parent->left) {
+            if (W->color == 1) {
                 W->color = 0;
                 X->parent->color = 1;
-                leftRotate(X->parent);
                 W = X->parent->right;
             }
             if (W->left->color == 0 && W->right->color == 0) {
@@ -217,7 +234,7 @@ private:
                 X->parent->color = 0;
                 W->right->color = 0;
                 leftRotate(X->parent);
-                X = root; 
+                X = root;
             }
         } 
         X->color = 0;

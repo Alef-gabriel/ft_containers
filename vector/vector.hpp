@@ -1,49 +1,62 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 #include <iostream>
-#include <initializer_list>
-#include <memory>
-#include <cstddef>
-#include <algorithm>
+#include "VectorIterator.hpp"
+#include "../ReverseIterator.hpp"
 
 namespace ft {
 template<class T, class Allocator = std::allocator<T> >
 class vector
 {
 public:
-	typedef Allocator 						allocator_type;
+	typedef Allocator 		allocator_type;
 	typedef T	value_type;
-	typedef typename std::vector<value_type>::iterator iterator;
-	typedef typename std::reverse_iterator<iterator>		reverse_iterator;
+	typedef std::size_t size_type;
+	typedef typename allocator_type::reference reference;
+	typedef typename allocator_type::const_reference const_reference;
+  	typedef typename allocator_type::pointer pointer;
+  	typedef typename allocator_type::const_pointer const_pointer;
+	typedef ft::VectorIterator<value_type> iterator;
+	typedef ft::VectorIterator<const value_type> const_iterator;
+	typedef ft::ReverseIterator<iterator> reverse_iterator;
+	typedef ft::ReverseIterator<const_iterator> const_reverse_iterator;
 
 	vector() : m_size(0), m_capacity(0), m_data(NULL) {}
-
-	vector(std::initializer_list<value_type> data) {
-		m_size = data.size();
-		m_capacity = data.size();
-		m_data =  _allocator.allocate(data.size());
-		for (size_t i = 0; i < data.size(); i++) {
-			m_data[i] = *(data.begin() + i);
-		}
-	}
 
 	explicit vector (const allocator_type &alloc): _allocator(alloc), m_size(0), m_capacity(0), m_data(NULL) {}
 
 	vector (vector const & obj){
-		std::cout << "Copy" << '\n';
 		*this = obj;
 	}
 
-	explicit vector (size_t count,
+	explicit vector (size_type count,
 					const value_type &value = value_type(),
 					const allocator_type &alloc = allocator_type()) {
 		m_size =  count;
 		m_capacity = count;
 		_allocator = alloc;
 		m_data =  _allocator.allocate(count);
-		for (size_t i = 0; i < count; i++) {
+		for (size_type i = 0; i < count; i++) {
 			_allocator.construct(m_data, value);
 		}
+	}
+
+	void assign(size_type count, const value_type &value) {
+		m_size = 0;
+		reserve(count);
+		for (size_type i = 0; i < count; i++)
+		push_back(value);
+	}
+
+	template<class Interator>
+	void assign(Interator first,
+				Interator last,
+				typename ft::enable_if<!ft::is_integral<Interator>::value,
+										Interator>::type = Interator()) {
+		clear();
+		reserve(last - first);
+		while (first != last)
+			push_back(*first++);
 	}
 
 	vector& operator=( vector&& obj ) {
@@ -71,29 +84,57 @@ public:
 		return iterator(m_data + m_size);
 	}
 
-	value_type & at(int i){
-		return m_data[i];
+	reference & at(size_type pos){
+		if (pos >= this->size())
+      		throw (std::out_of_range("ft::vector::out-of-range"));
+    	return (_data[pos]);
 	}
 	
-	value_type * data(){
+	const_reference at(size_type pos) const {
+		if (pos >= this->size())
+			throw (std::out_of_range("ft::vector::out-of-range"));
+		return (_data[pos]);
+  	}
+
+	value_type *data(){
 		return m_data;
 	}
 
-	value_type & front(void){
+	const value_type *data() const {
+    	return _data;
+  	}
+
+	reference & front(void){
 		return m_data[0];
 	}
 
-	value_type & back(void){
+	const_reference front() const {
+    	return (_data[0]);
+	}
+
+	reference & back(void){
 		return m_data[m_size - 1];
 	}
 
-	value_type & rbegin(void){
-		return m_data[m_size - 1];
+	const_reference back() const {
+    return (_data[_size - 1]);
 	}
 
-	value_type & rend(void){
-		return m_data[0];
+	reverse_iterator rbegin(void){
+		return reverse_iterator(end());
 	}
+
+	const_reverse_iterator rbegin() const {
+    	return const_reverse_iterator(end());
+  	}
+
+	reverse_iterator rend() {
+   		return reverse_iterator(begin());
+  	}
+
+	const_reverse_iterator rend() const {
+    	return const_reverse_iterator(begin());
+  	}
 
 	bool empty(void) const {
 		if (m_size == 0)
@@ -101,16 +142,16 @@ public:
 		return false;
 	}
 
-	size_t size() const{
+	size_type size() const{
 		return m_size;
 	}
 
-	size_t max_size() const{
+	size_type max_size() const{
 		return _allocator.max_size();
 	}
 
 	void push_back(value_type data){
-		size_t	newCapacity;
+		size_type	newCapacity;
 
 		newCapacity = m_capacity + 1;
 		if (m_capacity <= m_size)
@@ -126,7 +167,7 @@ public:
 		}
 	}
 
-	size_t size(void){
+	size_type size(void){
 		return m_size;
 	}
 
@@ -136,13 +177,15 @@ public:
 		return true;
 	}
 
-	size_t capacity() const {
+	size_type capacity() const {
 		return m_capacity;
 	}
 
-	void reserve( size_t new_cap ) {
+	void reserve( size_type new_cap ) {
+		if (new_cap > max_size())
+      		throw std::length_error("ft::vector::length_error");
 		value_type* newBlock = _allocator.allocate(new_cap);
-		for (size_t i = 0; i < m_size; i++)
+		for (size_type i = 0; i < m_size; i++)
 			newBlock[i] = m_data[i];
 		_allocator.deallocate(m_data, m_size);
 		m_data = newBlock;
@@ -162,9 +205,8 @@ public:
 		m_size = 0;
 	}
 
-	//TODO UPDATE TO CONST_ITERATOR
-	iterator insert( iterator pos, value_type&& value ) {
-		size_t index = std::distance( this->begin(), pos);
+	iterator insert( iterator pos, const value_type & value ) {
+		size_type index = std::distance( this->begin(), pos);
 		if (index > this->max_size())
 			return pos;
 		if (index > m_size) {
@@ -176,7 +218,7 @@ public:
 			value_type var;
 			value_type aux = value;
 			this->reserve(m_size + 2);
-			for (size_t i = index; i < (m_size + 1); i++) {
+			for (size_type i = index; i < (m_size + 1); i++) {
 				var = m_data[i];
 				m_data[i] = aux;
 				aux = var;
@@ -186,30 +228,88 @@ public:
 		return pos;
 	}
 
+	void insert(iterator pos, size_type count, const value_type &value) {
+		vector tmp;
+		size_type index = pos - begin();
+		size_type tmp_end = end() - pos;
+
+		tmp.assign(pos, end());
+		if ((count + _storageSpace) > (_storageSpace * 2)) {
+			reserve(_size + count);
+		}
+		else if (!_size) {
+			reserve(count);
+		}
+		_size = index;
+		for (size_type i = 0; i < count; i++) {
+			push_back(value);
+		}
+		for (size_type i = 0; i < tmp_end; i++) {
+			push_back(tmp[i]);
+		}
+ 	}
+
+	template<class Interator>
+	void insert(iterator pos,
+				Interator first,
+				Interator last,
+				typename ft::enable_if<!ft::is_integral<Interator>::value,
+										Interator>::type = Interator()) {
+		vector tmp;
+		size_type index = pos - begin();
+		size_type tmp_end = end() - pos;
+		difference_type diference = last - first;
+
+		tmp.assign(pos, end());
+		if ((diference + _storageSpace) > (_storageSpace * 2)) {
+			reserve(_size + diference);
+		}
+		else if (!_size) {
+			reserve(diference);
+		}
+		_size = index;
+		do {
+			push_back(*first++);
+		} while (first != last);
+		for (size_type i = 0; i < tmp_end; i++) {
+			push_back(tmp[i]);
+		}
+  	}
+
 	iterator erase( iterator pos ) {
-		size_t index = std::distance( this->begin(), pos);
+		size_type index = std::distance( this->begin(), pos);
 		if (index > m_size) {
 			return pos;
 		}
 		value_type var;
 		_allocator.destroy(m_data + index);
-		for (size_t i = index; i < m_size; i++) {
+		for (size_type i = index; i < m_size; i++) {
 			if ((i + 1) < m_size) {
 				var = m_data[i + 1];
 				m_data[i] = var;
-				std::cout << i << '\n';
 			}
 		}
 		m_size--;
 		return pos;
 	}
 
-	void resize( size_t count ) {
+	iterator erase(iterator first, iterator last) {
+		iterator tmp = first;
+		do {
+			*tmp = *last;
+			tmp++;
+			last++;
+		} while (last != end());
+		m_size -= last - first;
+		return tmp;
+  	}
+
+	void resize( size_type count ) {
 		if (count > m_size) {
 			this->reserve(count);
 			m_size = count;
 		}
-		for (size_t i = m_size; i > count; i--) {
+		for (size_type i = m_size; i > count; i--) {
 			_allocator.destroy(m_data + i);
 			m_size--;
 		}
@@ -236,8 +336,8 @@ public:
 
 private:
 	allocator_type _allocator;
-	size_t m_size;
-	size_t m_capacity;
+	size_type m_size;
+	size_type m_capacity;
 	value_type* m_data;
 
 	template<typename J>

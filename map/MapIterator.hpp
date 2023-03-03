@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Tree.hpp"
 
+namespace ft {
+  
 template<typename T, typename Compare, typename Allocator>
 class MapIterator {
  public:
@@ -13,7 +15,7 @@ class MapIterator {
   typedef T *pointer;
   typedef T &reference;
   typedef std::bidirectional_iterator_tag iterator_category;
-  typedef Node<value_type, Allocator> node_type;
+  typedef Node<value_type, Compare, Allocator> node_type;
 
   MapIterator() : _pointer(NULL) {}
 
@@ -103,5 +105,5 @@ class MapIterator {
 
   const Tree<value_type, Compare, Allocator> *_tree;
 };
-
+}
 #endif 

@@ -3,6 +3,8 @@
 #include <iostream>
 #include "VectorIterator.hpp"
 #include "../ReverseIterator.hpp"
+#include "../types.hpp"
+#include "../auxiliary.hpp"
 
 namespace ft {
 template<class T, class Allocator = std::allocator<T> >
@@ -12,6 +14,7 @@ public:
 	typedef Allocator 		allocator_type;
 	typedef T	value_type;
 	typedef std::size_t size_type;
+	typedef std::ptrdiff_t difference_type;
 	typedef typename allocator_type::reference reference;
 	typedef typename allocator_type::const_reference const_reference;
   	typedef typename allocator_type::pointer pointer;
@@ -87,13 +90,13 @@ public:
 	reference & at(size_type pos){
 		if (pos >= this->size())
       		throw (std::out_of_range("ft::vector::out-of-range"));
-    	return (_data[pos]);
+    	return (m_data[pos]);
 	}
 	
 	const_reference at(size_type pos) const {
 		if (pos >= this->size())
 			throw (std::out_of_range("ft::vector::out-of-range"));
-		return (_data[pos]);
+		return (m_data[pos]);
   	}
 
 	value_type *data(){
@@ -101,7 +104,7 @@ public:
 	}
 
 	const value_type *data() const {
-    	return _data;
+    	return m_data;
   	}
 
 	reference & front(void){
@@ -109,7 +112,7 @@ public:
 	}
 
 	const_reference front() const {
-    	return (_data[0]);
+    	return (m_data[0]);
 	}
 
 	reference & back(void){
@@ -117,7 +120,7 @@ public:
 	}
 
 	const_reference back() const {
-    return (_data[_size - 1]);
+    return (m_data[m_size - 1]);
 	}
 
 	reverse_iterator rbegin(void){
@@ -234,13 +237,13 @@ public:
 		size_type tmp_end = end() - pos;
 
 		tmp.assign(pos, end());
-		if ((count + _storageSpace) > (_storageSpace * 2)) {
-			reserve(_size + count);
+		if ((count + m_capacity) > (m_capacity * 2)) {
+			reserve(m_size + count);
 		}
-		else if (!_size) {
+		else if (!m_size) {
 			reserve(count);
 		}
-		_size = index;
+		m_size = index;
 		for (size_type i = 0; i < count; i++) {
 			push_back(value);
 		}
@@ -261,13 +264,13 @@ public:
 		difference_type diference = last - first;
 
 		tmp.assign(pos, end());
-		if ((diference + _storageSpace) > (_storageSpace * 2)) {
-			reserve(_size + diference);
+		if ((diference + m_capacity) > (m_capacity * 2)) {
+			reserve(m_size + diference);
 		}
-		else if (!_size) {
+		else if (!m_size) {
 			reserve(diference);
 		}
-		_size = index;
+		m_size = index;
 		do {
 			push_back(*first++);
 		} while (first != last);
@@ -322,18 +325,6 @@ public:
 		_swap(this->_allocator, other._allocator);
 	}
 	
-	template< class T, class Allocator >
-	friend bool operator==(const vector<T, Allocator>& lhs,
-					const vector<T, Allocator>& rhs ) {
-		return (std::equal(lhs.begin(),lhs.end(), rhs.begin()));
-	}
-
-	template< class T, class Alloc >
-	friend bool operator!=( const std::vector<T, Alloc>& lhs,
-					const std::vector<T, Alloc>& rhs ) {
-		return (!(std::equal(lhs.begin(),lhs.end(), rhs.begin())));
-	}
-
 private:
 	allocator_type _allocator;
 	size_type m_size;
@@ -348,5 +339,53 @@ private:
 	}
 
 };
+
+template<class T, class Allocator>
+bool operator==(const vector<T, Allocator> &lhs,
+                const vector<T, Allocator> &rhs) {
+  return (
+      ft::equal(lhs.begin(),
+                lhs.end(),
+                rhs.begin()));
+}
+
+template<class T, class Allocator>
+bool operator!=(const vector<T, Allocator> &lhs,
+                const vector<T, Allocator> &rhs) {
+  return (
+      !(ft::equal(lhs.begin(),
+                  lhs.end(),
+                  rhs.begin())));
+}
+
+template<class T, class Allocator>
+bool operator<(const vector<T, Allocator> &lhs,
+               const vector<T, Allocator> &rhs) {
+  return (
+      ft::lexicographical_compare(lhs.begin(),
+                                  lhs.end(),
+                                  rhs.begin(),
+                                  rhs.end()));
+}
+
+template<class T, class Allocator>
+bool operator<=(const vector<T, Allocator> &lhs, const vector<T, Allocator> &rhs) {
+  return !(lhs > rhs);
+}
+
+template<class T, class Allocator>
+bool operator>(const vector<T, Allocator> &lhs,
+               const vector<T, Allocator> &rhs) {
+  return (
+      ft::lexicographical_compare(rhs.begin(),
+                                  rhs.end(),
+                                  lhs.begin(),
+                                  lhs.end()));
+}
+
+template<class T, class Allocator>
+bool operator>=(const vector<T, Allocator> &lhs, const vector<T, Allocator> &rhs) {
+  return !(lhs < rhs);
+}
 }
 #endif

@@ -2,7 +2,13 @@
 #define MAP_HPP
 #include "Tree.hpp"
 #include "MapIterator.hpp"
+#include "../ReverseIterator.hpp"
 #include "../vector/vector.hpp"
+
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <vector>
 
 namespace ft {
 template<class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<T> >
@@ -22,7 +28,7 @@ public:
 
     typedef Allocator allocator_type;
 
-    typedef ft::pair<const key_type, mapped_type> value_type;
+    typedef std::pair<const key_type, mapped_type> value_type;
 
     typedef typename allocator_type::reference reference;
 
@@ -30,7 +36,7 @@ public:
 
     typedef typename allocator_type::pointer pointer;
 
-    typedef typename MapIterator<value_type, Compare, Allocator> iterator;
+    typedef typename ft::MapIterator<value_type, Compare, Allocator> iterator;
 
     typedef typename ft::MapIterator<value_type, Compare, Allocator> const_iterator;
 
@@ -97,7 +103,7 @@ public:
 
     iterator begin() {
         if (_tree.minNode()) {
-            return (iterator(_tree.minNode()->data, &_tree));
+            return (iterator(_tree.minNode()->value, &_tree));
         }
         else {
             return (iterator(NULL, &_tree));
@@ -136,14 +142,14 @@ public:
         return _allocator.max_size();
     }
 
-    pair<iterator, bool> insert(const value_type &value) {
+    std::pair<iterator, bool> insert(const value_type &value) {
         Node<value_type, key_type, Allocator> *node = _tree.search(_tree.root, value);
         if (!node) {
             node = _tree.insert(value);
             _size++;
-            return (pair<iterator, bool>(iterator(node->data, &_tree), true));
+            return (std::pair<iterator, bool>(iterator(node->value, &_tree), true));
         }
-        return (pair<iterator, bool>(iterator(node->data, &_tree), false));
+        return (std::pair<iterator, bool>(iterator(node->value, &_tree), false));
     }
 
     iterator insert(iterator pos, const value_type &value) {
@@ -177,32 +183,32 @@ public:
 
     size_type erase(const key_type &key) {
         _size--;
-        return _tree.remove(pair(key, mapped_type()));
+        return _tree.remove(std::pair(key, mapped_type()));
     }
 
     size_type count(const key_type &key) const {
-        if (_tree.search(pair(key, mapped_type())) != NULL)
+        if (_tree.search(std::pair(key, mapped_type())) != NULL)
             return (1);
         return (0);
     }
 
     iterator find(const key_type &key) {
-        Node<value_type, key_type, Allocator> *node = _tree.search(pair(key, mapped_type()));
-        return iterator(node ? node->data : NULL, &_tree);
+        Node<value_type, key_type, Allocator> *node = _tree.search(std::pair(key, mapped_type()));
+        return iterator(node ? node->value : NULL, &_tree);
     }
 
     const_iterator find(const key_type &key) const {
-        Node<value_type, key_type, Allocator> *node = _tree.search(_tree.root, ft::make_pair(key, mapped_type()));
+        Node<value_type, key_type, Allocator> *node = _tree.search(_tree.root, std::pair(key, mapped_type()));
 
-        return const_iterator(node ? node->data : NULL, &_tree);
+        return const_iterator(node ? node->value : NULL, &_tree);
     }
 
-    pair<iterator, iterator> equal_range(const key_type &key) {
-        return pair(lower_bound(key), upper_bound(key));
+    std::pair<iterator, iterator> equal_range(const key_type &key) {
+        return std::pair(lower_bound(key), upper_bound(key));
     }
 
-    pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
-        return pair(lower_bound(key), upper_bound(key));
+    std::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
+        return std::pair(lower_bound(key), upper_bound(key));
     }
 
     iterator lower_bound(const key_type &key) {
@@ -210,14 +216,14 @@ public:
         Node<value_type, key_type, Allocator> *lower = node;
 
         while (node != NULL) {
-            if (!_comparator(node->data->first, key)) {
+            if (!_comparator(node->value->first, key)) {
                 lower = node;
                 node = node->left;
             } else {
                 node = node->right;
             }
         }
-        return iterator(lower ? lower->data : NULL, &_tree);
+        return iterator(lower ? lower->value : NULL, &_tree);
     }
 
     const_iterator lower_bound(const key_type &key) const {
@@ -225,14 +231,14 @@ public:
         Node<value_type, key_type, Allocator> *lower = node;
 
         while (node != NULL) {
-            if (!_comparator(node->data->first, key)) {
+            if (!_comparator(node->value->first, key)) {
                 lower = node;
                 node = node->left;
             } else {
                 node = node->right;
             }
         }
-        return const_iterator(lower ? lower->data : NULL, &_tree);
+        return const_iterator(lower ? lower->value : NULL, &_tree);
     }
 
     iterator upper_bound(const key_type &key) {
@@ -240,14 +246,14 @@ public:
         Node<value_type, key_type, Allocator> *upper = node;
 
         while (node != NULL) {
-            if (_comparator(key, node->data->first)) {
+            if (_comparator(key, node->value->first)) {
                 upper = node;
                 node = node->left;
             } else {
                 node = node->right;
             }
         }
-        return iterator(upper ? upper->data : NULL, &_tree);
+        return iterator(upper ? upper->value : NULL, &_tree);
     }
 
     const_iterator upper_bound(const key_type &key) const {
@@ -255,14 +261,14 @@ public:
         Node<value_type, key_type, Allocator> *upper = node;
 
         while (node != NULL) {
-            if (_comparator(key, node->data->first)) {
+            if (_comparator(key, node->value->first)) {
                 upper = node;
                 node = node->left;
             } else {
                 node = node->right;
             }
         }
-        return const_iterator(upper ? upper->data : NULL, &_tree);
+        return const_iterator(upper ? upper->value : NULL, &_tree);
     }
 
     void swap(map &other) {

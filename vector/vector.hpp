@@ -62,7 +62,7 @@ public:
 			push_back(*first++);
 	}
 
-	vector& operator=( vector&& obj ) {
+	vector& operator=( vector& obj ) {
 		this->_allocator = obj.get_allocator();
 		this->m_size = obj.size();
 		this->m_capacity = obj.capacity();

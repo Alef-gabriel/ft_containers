@@ -1,18 +1,21 @@
 #ifndef TREE_HPP
 #define TREE_HPP
-#include <iostream>
+#include <clocale>
+#include <algorithm>
 #include <memory>
 #include "Node.hpp"
 
-template<class Key, class T, class Allocator = std::allocator<T> >
+namespace ft {
+template<class Key, class T, class Allocator >
 class Tree
 {
 public:
 	typedef Key	key_type;
     typedef T	value_type;
     typedef Allocator 						allocator_type;
-    typedef Node< key_type , value_type, allocator_type> node_type;
+    typedef Node< key_type, Allocator> node_type;
     typename Allocator::template rebind<node_type>::other rebind_allocator;
+    node_type* root;
 
     Tree(): root(NULL) {}
 
@@ -20,21 +23,19 @@ public:
         clear();
     }
 
-
-    void insert(Key key, T value) {
+    node_type *insert(const key_type &value) {
+        node_type *res;
         if (root) {
             while (root) {
-                if (root->key == key) {
-                    return ;
-                }
-                if (key < root->key) {
+                if (value.first < root->value->first) {
                     if (root->left) {
                         root = root->left;
                     }
                     else {
-                        root->left = newNode(key, value, 1, root);
+                        root->left = newNode(value, root);
+                        res = root->left;
                         rebalance(root);
-                        root->color = 0;
+                        _size++;
                         break ;
                     }
                 }
@@ -43,9 +44,9 @@ public:
                         root = root->right;
                     }
                     else {
-                        root->right = newNode(key, value, 1, root);
+                        root->right = newNode(value, root);
+                        res = root->right;
                         rebalance(root);
-                        root->color = 0;
                         _size++;
                         break ;
                     }
@@ -53,8 +54,11 @@ public:
             }
         }
         else {
-            root = newNode(key, value, 0, root);
+            root = newNode(value, root);
+            res = root;
         }
+        root->color = 0;
+        return res;
     }
 
     void clear(void) {
@@ -62,19 +66,18 @@ public:
         root = NULL;
     }
 
-
-    node_type *search(Key key) {
+    node_type *search(key_type const &key) const {
         node_type *tree = root;
         node_type *res = NULL;
 
         if (tree) {
             while (tree)
             {
-                if (key > tree->key) {
+                if (key.first > tree->value->first) {
                     tree = tree->right;
                 }
                 else {
-                    if (key == tree->key) {
+                    if (key.first == tree->value->first) {
                         res = tree;
                         break ;
                     }
@@ -83,6 +86,15 @@ public:
             }   
         }
         return res;
+    }
+
+    bool remove(value_type key) {
+        node_type *node = root.search(key);
+        if (node) {
+            this->root = this->remove(node);
+            return true;
+        }
+        return false;
     }
 
     int remove(node_type *tree) {
@@ -112,8 +124,27 @@ public:
         return 0;
     }
 
+    node_type* minNode(void) {
+        node_type *min = root;
+        
+        while (min->left)
+        {
+            min = min->left;
+        }
+        return min;
+    }
+
+    node_type* maxNode(void) {
+        node_type *max = root;
+        
+        while (max->right)
+        {
+            max = max->right;
+        }
+        return max;
+    }
+
 private:
-    node_type* root;
     size_t  _size;
     allocator_type _allocator;
 
@@ -135,42 +166,20 @@ private:
                         P->left = NULL;
                     }
                 }
+                R->_alloc.deallocate(R->value, 1);
                 rebind_allocator.deallocate(R, 1);
                 delete_all(P);
             }
         }
     }
 
-    node_type* newNode(Key key, T value, int color, node_type *parent) {
+    node_type* newNode(const key_type &key, node_type *parent) {
         node_type* var = rebind_allocator.allocate(1);
-        var->left = NULL;
-        var->right = NULL;
-        var->key = key;
-        var->value = value;
-        var->color = color;
+        rebind_allocator.construct(var, key);
         var->parent = parent;
         return var;
     }
 
-    node_type* minNode(void) {
-        node_type *min = root;
-        
-        while (min->left)
-        {
-            min = min->left;
-        }
-        return min;
-    }
-
-    node_type* maxNode(void) {
-        node_type *max = root;
-        
-        while (max->right)
-        {
-            max = max->right;
-        }
-        return max;
-    }
 
     void rebalance(node_type* &H) {
         while (H->parent != NULL)
@@ -296,4 +305,5 @@ private:
         X->color = 0;
     }
 };
+}
 #endif

@@ -9,101 +9,109 @@ namespace ft {
   
 template<typename T, typename Compare, typename Allocator>
 class MapIterator {
- public:
-  typedef std::ptrdiff_t difference_type;
-  typedef T value_type;
-  typedef T *pointer;
-  typedef T &reference;
-  typedef std::bidirectional_iterator_tag iterator_category;
-  typedef Node<value_type, Compare, Allocator> node_type;
+  public:
+    typedef std::ptrdiff_t difference_type;
 
-  MapIterator() : _pointer(NULL) {}
+    typedef T value_type;
 
-  explicit MapIterator(pointer it, const Tree<value_type, Compare, Allocator> *avl = NULL)
-      : _pointer(it), _tree(avl) {}
+    typedef T *pointer;
 
-  MapIterator(MapIterator const &copy) { *this = copy; }
+    typedef T &reference;
 
-  MapIterator &operator=(MapIterator const &copy) {
-    _pointer = copy._pointer;
-    _tree = copy._tree;
-    return *this;
-  }
+    typedef std::bidirectional_iterator_tag iterator_category;
 
-  ~MapIterator() {}
+    typedef Node<value_type, Allocator> node_type;
 
-  operator MapIterator<const T, Compare, Allocator>() const {
-    return (MapIterator<const T, Compare, Allocator>(
-        _pointer, reinterpret_cast<Tree<const value_type, Compare, Allocator> const *>(_tree)));
-  }
+    typedef Tree<value_type, Compare, Allocator> tree_type;
 
-  bool operator==(MapIterator const &obj) {
-    return _pointer == obj._pointer;
-  }
+    MapIterator() : _pointer(NULL) {}
 
-  bool operator!=(MapIterator const &obj) {
-    return _pointer != obj._pointer;
-  }
+    explicit MapIterator(pointer it, tree_type const *avl = NULL)
+        : _pointer(it), _tree(avl) {}
 
-  reference operator*() {
-    return *_pointer;
-  }
+    MapIterator(MapIterator const &copy) { *this = copy; }
 
-  pointer operator->() {
-    return &operator*();
-  }
-
-  MapIterator &operator++() {
-    node_type *node = _tree->find(_tree->root, *_pointer);
-
-    if (node) {
-      node_type *tmp = _tree->next(*_pointer);
-
-      if (tmp)
-        _pointer = tmp->data;
-      else
-        _pointer = NULL;
+    MapIterator &operator=(MapIterator const &copy) {
+      _pointer = copy._pointer;
+      _tree = copy._tree;
+      return *this;
     }
-    return *this;
-  }
 
-  MapIterator operator++(int) {
-    MapIterator tmp = *this;
+    ~MapIterator() {}
 
-    ++(*this);
-    return tmp;
-  }
-
-  MapIterator &operator--() {
-    node_type *node = NULL;
-
-    if (!_pointer) {
-      node = _tree->Max(_tree->root);
-      if (node) _pointer = node->data;
-      return (*this);
+    operator MapIterator<const T, Compare, Allocator>() const {
+      return (MapIterator<const T, Compare, Allocator>(
+          _pointer, reinterpret_cast<Tree<const value_type, Compare, Allocator> const *>(_tree)));
     }
-    node = _tree->find(_tree->root, *_pointer);
-    if (node) {
-      node_type *tmp = _tree->previous(*_pointer);
-      if (tmp)
-        _pointer = tmp->data;
-      else
-        _pointer = NULL;
+
+    bool operator==(MapIterator const &obj) {
+      return _pointer == obj._pointer;
     }
-    return *this;
-  }
 
-  MapIterator operator--(int) {
-    MapIterator tmp = *this;
+    bool operator!=(MapIterator const &obj) {
+      return _pointer != obj._pointer;
+    }
 
-    --(*this);
-    return tmp;
-  }
+    reference operator*() {
+      return *_pointer;
+    }
 
- private:
-  pointer _pointer;
+    pointer operator->() {
+      return &operator*();
+    }
 
-  const Tree<value_type, Compare, Allocator> *_tree;
+    MapIterator &operator++() {
+      node_type *node = _tree->find(_tree->root, *_pointer);
+
+      if (node) {
+        node_type *tmp = _tree->next(*_pointer);
+
+        if (tmp)
+          _pointer = tmp->data;
+        else
+          _pointer = NULL;
+      }
+      return *this;
+    }
+
+    MapIterator operator++(int) {
+      MapIterator tmp = *this;
+
+      ++(*this);
+      return tmp;
+    }
+
+    MapIterator &operator--() {
+      node_type *node = NULL;
+
+      if (!_pointer) {
+        node = _tree->Max(_tree->root);
+        if (node) _pointer = node->data;
+        return (*this);
+      }
+      node = _tree->find(_tree->root, *_pointer);
+      if (node) {
+        node_type *tmp = _tree->previous(*_pointer);
+        if (tmp)
+          _pointer = tmp->data;
+        else
+          _pointer = NULL;
+      }
+      return *this;
+    }
+
+    MapIterator operator--(int) {
+      MapIterator tmp = *this;
+
+      --(*this);
+      return tmp;
+    }
+
+  private:
+    pointer _pointer;
+
+    const tree_type *_tree;
 };
+
 }
 #endif 

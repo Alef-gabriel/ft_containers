@@ -61,6 +61,16 @@ public:
         return res;
     }
 
+    void assign(const node_type *node) {
+        if (!node)
+        return;
+
+        assign(node->left);
+        if (node->value)
+            insert(*(node->value));
+        assign(node->right);
+    }
+
     void clear(void) {
         delete_all(root);
         root = NULL;
@@ -88,60 +98,108 @@ public:
         return res;
     }
 
-    bool remove(value_type key) {
-        node_type *node = root.search(key);
+    bool remove(key_type const &key) {
+        node_type *node = search(key);
         if (node) {
-            this->root = this->remove(node);
+            remove(node);
             return true;
         }
         return false;
     }
 
-    int remove(node_type *tree) {
+    bool remove(node_type *tree) {
         if (tree) {
             node_type *u = tree;
             if (tree->parent == NULL || tree->parent->left == u) {
                 tree = tree->left;
-                if (tree->right) {
-                    while (tree->right) {
-                        tree = tree->right;
-                    }
-                    tree->parent->right = NULL;
-                }
-                else {
-                    tree->parent->left = NULL;
-                }
+                tree = maxNode(tree);
             }
             else {
                 tree = tree->right;
             }
             transplant(u, tree);
             deleteFixup(tree);
+            _allocator.deallocate(u->value, 1);
             rebind_allocator.deallocate(u, 1);
             _size--;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
-    node_type* minNode(void) {
+    node_type* minNode(void) const {
         node_type *min = root;
         
-        while (min->left)
-        {
-            min = min->left;
+        if (min) {
+            while (min->left) {
+                min = min->left;
+            }
         }
         return min;
     }
 
-    node_type* maxNode(void) {
+    node_type* minNode(node_type *node) const {
+        node_type *min = node;
+        if (min) {
+            while (min->left) {
+                min = min->left;
+            }
+        }
+        return min;
+    }
+
+    node_type* maxNode(void) const {
         node_type *max = root;
-        
-        while (max->right)
-        {
-            max = max->right;
+        if (max) {
+            while (max->right) {
+                max = max->right;
+            }
         }
         return max;
+    }
+
+    node_type* maxNode(node_type *node) const {
+        node_type *max = node;
+        if (max) {
+            while (max->right) {
+                max = max->right;
+            }
+        }
+        return max;
+    }
+
+    node_type *next(key_type const &key) const {
+        node_type *node = search(key);
+        if (!node)
+            return (NULL);
+
+        if (node->right != NULL)
+            return (minNode(node->right));
+
+        node_type *next = node->parent;
+        while (next != NULL && node == next->right) {
+            node = next;
+            next = next->parent;
+        }
+        node = next;
+        return node;
+    }
+
+    node_type *previous(key_type const &key) const {
+        node_type *node = search(key);
+        if (!node)
+            return (NULL);
+
+        if (node->left != NULL)
+            return (maxNode(node->left));
+
+        node_type *previous = node->parent;
+        while (previous != NULL && node == previous->left) {
+            node = previous;
+            previous = previous->parent;
+        }
+        node = previous;
+        return node;
     }
 
 private:
@@ -149,12 +207,13 @@ private:
     allocator_type _allocator;
 
     void delete_all (node_type *R) {
-        if (R) {
+        while (R)
+        {
             if (R->left) {
-                delete_all(R->left);
+                R = R->left;
             }
             else if (R->right) {
-                delete_all(R->right);
+                R = R->right;
             }
             else {
                 node_type *P = R->parent;
@@ -168,9 +227,10 @@ private:
                 }
                 R->_alloc.deallocate(R->value, 1);
                 rebind_allocator.deallocate(R, 1);
-                delete_all(P);
+                R = P;
             }
         }
+        
     }
 
     node_type* newNode(const key_type &key, node_type *parent) {
@@ -260,49 +320,55 @@ private:
             else {
                 u->parent->left = v;
             }
-            v->left = u->left;
-            if (v->left) {
-                v->left->parent = v;
-            }
-            v->right = u->right;
-            if (v->right) {
-                v->right->parent = v;
+            if (v) {
+                if (v != u->left) {
+                    v->left = u->left;
+                    v->left->parent = v;
+                }
+                v->right = u->right;
+                if (v->right) {
+                    v->right->parent = v;
+                }
             }
         }
         else {
             u->parent->right = v;
         }
-        v->parent = u->parent;
+        if (v) {
+            v->parent = u->parent;
+        }
     }
 
     void deleteFixup(node_type *X) {
-        while (X != root && X->color == 0) {
-            node_type *W = X->parent->right;
-            if (W->color == 1) {
-                W->color = 0;
-                X->parent->color = 1;
-                W = X->parent->right;
-            }
-            if (W->left->color == 0 && W->right->color == 0) {
-                W->color = 1;
-                X->right->color = 1;
-                X = X->parent;
-            }
-            else { 
-                if (W->right->color == 0) {
-                    W->left->color = 0;
-                    W->color = 1;
-                    rightRotate(W);
+        if (X) {
+            while (X != root && X->color == 0) {
+                node_type *W = X->parent->right;
+                if (W->color == 1) {
+                    W->color = 0;
+                    X->parent->color = 1;
                     W = X->parent->right;
                 }
-                W->color = X->parent->color;
-                X->parent->color = 0;
-                W->right->color = 0;
-                leftRotate(X->parent);
-                X = root;
-            }
-        } 
-        X->color = 0;
+                if (W->left && W->left->color == 0 && W->right && W->right->color == 0) {
+                    W->color = 1;
+                    X->right->color = 1;
+                    X = X->parent;
+                }
+                else {
+                    if (W->right) {
+                        if (W->right->color == 0) {
+                            W->left->color = 0;
+                            W->color = 1;
+                            W = X->parent->right;
+                        }
+                        W->right->color = 0;
+                    }
+                    W->color = X->parent->color;
+                    X->parent->color = 0;
+                    X = root;
+                }
+            } 
+            X->color = 0;
+        }
     }
 };
 }

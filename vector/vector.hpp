@@ -71,8 +71,10 @@ public:
 		return *this;
 	}
 
-	~vector(void){
-		delete[] m_data;
+	~vector(){
+		for (size_type i = 0; i < m_size; i++)
+      		_allocator.destroy(m_data + i);
+    	_deallocate();
 	}
 
 	value_type & operator[](int i){
@@ -87,7 +89,7 @@ public:
 		return iterator(m_data + m_size);
 	}
 
-	reference & at(size_type pos){
+	reference at(size_type pos){
 		if (pos >= this->size())
       		throw (std::out_of_range("ft::vector::out-of-range"));
     	return (m_data[pos]);
@@ -107,7 +109,7 @@ public:
     	return m_data;
   	}
 
-	reference & front(void){
+	reference front(void){
 		return m_data[0];
 	}
 
@@ -115,7 +117,7 @@ public:
     	return (m_data[0]);
 	}
 
-	reference & back(void){
+	reference back(void){
 		return m_data[m_size - 1];
 	}
 
@@ -204,8 +206,9 @@ public:
 	}
 
 	void clear() {
-		_allocator.deallocate(m_data, m_size);
-		m_size = 0;
+		for (size_type i = 0; i < m_size; i++)
+      		_allocator.destroy(m_data + i);
+    	m_size = 0;
 	}
 
 	iterator insert( iterator pos, const value_type & value ) {
@@ -325,19 +328,23 @@ public:
 		_swap(this->_allocator, other._allocator);
 	}
 	
-private:
-	allocator_type _allocator;
-	size_type m_size;
-	size_type m_capacity;
-	value_type* m_data;
+	private:
+		allocator_type _allocator;
+		size_type m_size;
+		size_type m_capacity;
+		value_type* m_data;
 
-	template<typename J>
-	void _swap(J& obj, J& other) {
-		J aux = obj;
-		obj = other;
-		other = aux;
-	}
+		template<typename J>
+		void _swap(J& obj, J& other) {
+			J aux = obj;
+			obj = other;
+			other = aux;
+		}
 
+		void _deallocate() {
+			if (m_capacity)
+    			_allocator.deallocate(m_data, m_capacity);
+ 		}
 };
 
 template<class T, class Allocator>

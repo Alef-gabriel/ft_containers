@@ -26,7 +26,7 @@ class MapIterator {
 
     MapIterator() : _pointer(NULL) {}
 
-    explicit MapIterator(pointer it, tree_type const *avl = NULL)
+    explicit MapIterator(pointer it, const tree_type *avl = NULL)
         : _pointer(it), _tree(avl) {}
 
     MapIterator(MapIterator const &copy) { *this = copy; }
@@ -61,13 +61,13 @@ class MapIterator {
     }
 
     MapIterator &operator++() {
-      node_type *node = _tree->find(_tree->root, *_pointer);
+      node_type *node = _tree->search(*_pointer);
 
       if (node) {
         node_type *tmp = _tree->next(*_pointer);
 
         if (tmp)
-          _pointer = tmp->data;
+          _pointer = tmp->value;
         else
           _pointer = NULL;
       }
@@ -85,15 +85,15 @@ class MapIterator {
       node_type *node = NULL;
 
       if (!_pointer) {
-        node = _tree->Max(_tree->root);
-        if (node) _pointer = node->data;
+        node = _tree->maxNode();
+        if (node) _pointer = node->value;
         return (*this);
       }
-      node = _tree->find(_tree->root, *_pointer);
+      node = _tree->search(*_pointer);
       if (node) {
         node_type *tmp = _tree->previous(*_pointer);
         if (tmp)
-          _pointer = tmp->data;
+          _pointer = tmp->value;
         else
           _pointer = NULL;
       }

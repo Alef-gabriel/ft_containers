@@ -68,7 +68,7 @@ class map {
             *this = other;
         }
 
-          mapped_type &at(const key_type &key) {
+        mapped_type &at(const key_type &key) {
             value_type value = ft::make_pair<key_type const, mapped_type>(key, mapped_type());
             node_type *node = _tree.search(value);
 
@@ -88,7 +88,7 @@ class map {
 
         mapped_type &operator[](const key_type &key) {
             value_type value = ft::make_pair<key_type const, mapped_type>(key, mapped_type());
-            node_type *node = _tree.find(_tree.root, value);
+            node_type *node = _tree.search(value);
 
             if (!node) {
                 node = _tree.insert(value);
@@ -108,7 +108,10 @@ class map {
         }
 
         map& operator=( const map& other ) {
-            _size = 0;  
+            clear();
+            _tree.assign(other._tree.root);
+            _size = other.size();
+            return (*this);
         }
 
         ~map() {
@@ -134,6 +137,10 @@ class map {
             else {
                 return iterator(NULL, &_tree);
             }
+        }
+
+        const_iterator begin() const {
+            return (const_iterator(_tree.minNode() ? _tree.minNode()->value : NULL, &_tree));
         }
 
         iterator end() {
@@ -187,7 +194,6 @@ class map {
         void insert(InputIt first, InputIt last) {
             while (first != last) {
                 insert(*first);
-                first++;
             }
         }
 
@@ -203,17 +209,18 @@ class map {
                 keys.push_back(first->first);
                 first++;
             }
-            for (size_t i = 0; i < keys.size(); i++)
-            erase(keys[i]);
+            for (size_t i = 0; i < keys.size(); i++) {
+                erase(keys[i]);
+            }
         }
 
         size_type erase(const key_type &key) {
             _size--;
-            return _tree.remove(key);
+            return _tree.remove(ft::make_pair(key, mapped_type()));
         }
 
         size_type count(const key_type &key) const {
-            if (_tree.search(key) != NULL)
+            if (_tree.search(ft::make_pair(key, mapped_type())) != NULL)
                 return (1);
             return (0);
         }
@@ -230,11 +237,11 @@ class map {
         }
 
         ft::pair<iterator, iterator> equal_range(const key_type &key) {
-            ft::make_pair(lower_bound(key), upper_bound(key));
+            return ft::make_pair(lower_bound(key), upper_bound(key));
         }
 
         ft::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
-            ft::make_pair(lower_bound(key), upper_bound(key));
+            return ft::make_pair(lower_bound(key), upper_bound(key));
         }
 
         iterator lower_bound(const key_type &key) {

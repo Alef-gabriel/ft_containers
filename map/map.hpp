@@ -1,6 +1,6 @@
 #ifndef MAP_HPP
 #define MAP_HPP
-#include "Tree.hpp"
+#include "RedBlackTree.hpp"
 #include "MapIterator.hpp"
 #include "../auxiliary.hpp"
 #include "../ReverseIterator.hpp"
@@ -315,7 +315,7 @@ class map {
         size_type   _size;
         allocator_type _allocator;
         key_compare _comparator;
-        Tree< value_type , key_compare, allocator_type> _tree;
+        RedBlackTree< value_type , key_compare, allocator_type> _tree;
 
         template<typename U>
         void _swap(U &a, U &b) {

@@ -8,7 +8,7 @@
         "name": "(gdb) Iniciar",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/map/teste",
+        "program": "${workspaceFolder}/vector/teste",
         "args": [],
         "stopAtEntry": true,
         "cwd": "${fileDirname}",

@@ -29,7 +29,9 @@ public:
 	explicit vector (const allocator_type &alloc): _allocator(alloc), m_size(0), m_capacity(0), m_data(NULL) {}
 
 	vector (vector const & obj){
-		*this = obj;
+		m_size = 0;
+    	m_capacity = 0;
+    	*this = obj;
 	}
 
 	explicit vector (size_type count,
@@ -62,12 +64,19 @@ public:
 			push_back(*first++);
 	}
 
-	vector& operator=( vector& obj ) {
-		this->_allocator = obj.get_allocator();
-		this->m_size = obj.size();
-		this->m_capacity = obj.capacity();
-		this->m_data = this->data();
-		*this = obj;
+	vector& operator=( const vector& obj ) {
+		if (this != &obj) {
+			clear();
+			if (m_capacity)
+      			_allocator.deallocate(m_data, m_capacity);
+			m_size = obj.m_size;
+			m_capacity = obj.m_capacity;
+			_allocator = obj._allocator;
+			if (m_capacity)
+				m_data = _allocator.allocate(m_capacity);
+			for (size_type i = 0; i < m_size; i++)
+				_allocator.construct(m_data + i, obj.m_data[i]);
+		}
 		return *this;
 	}
 
@@ -85,8 +94,16 @@ public:
 		return iterator(m_data);
 	}
 
+	const_iterator begin() const {
+    	return const_iterator(m_data);
+  	}
+
 	iterator end(){
 		return iterator(m_data + m_size);
+	}
+
+	const_iterator end() const {
+   		return const_iterator(m_data + m_size);
 	}
 
 	reference at(size_type pos){
@@ -156,13 +173,12 @@ public:
 	}
 
 	void push_back(value_type data){
-		size_type	newCapacity;
-
-		newCapacity = m_capacity + 1;
-		if (m_capacity <= m_size)
-			reserve(newCapacity);
+		if (m_capacity == 0)
+      		reserve(1);
+		else if (m_size + 1 > m_capacity)
+			reserve(m_capacity * 2);
+		_allocator.construct(m_data + m_size, data);
 		m_size++;
-		m_data[m_size - 1] = data;
 	}
 
 	void pop_back() {
@@ -189,12 +205,16 @@ public:
 	void reserve( size_type new_cap ) {
 		if (new_cap > max_size())
       		throw std::length_error("ft::vector::length_error");
-		value_type* newBlock = _allocator.allocate(new_cap);
-		for (size_type i = 0; i < m_size; i++)
-			newBlock[i] = m_data[i];
-		_allocator.deallocate(m_data, m_size);
-		m_data = newBlock;
-		m_capacity = new_cap;
+		if (new_cap > m_capacity) {
+			pointer newBlock = _allocator.allocate(new_cap);
+			for (size_type i = 0; i < m_size; i++)
+				_allocator.construct(newBlock + i, m_data[i]);
+			if (m_capacity) {
+				_allocator.deallocate(m_data, m_capacity);
+			}
+			_swap(newBlock, m_data);
+			m_capacity = new_cap;
+		}
 	}
 
 	allocator_type get_allocator() const{

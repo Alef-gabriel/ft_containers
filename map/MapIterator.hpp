@@ -3,7 +3,7 @@
 
 #include <iterator>
 #include <iostream>
-#include "Tree.hpp"
+#include "RedBlackTree.hpp"
 
 namespace ft {
   
@@ -22,7 +22,7 @@ class MapIterator {
 
     typedef Node<value_type, Allocator> node_type;
 
-    typedef Tree<value_type, Compare, Allocator> tree_type;
+    typedef RedBlackTree<value_type, Compare, Allocator> tree_type;
 
     MapIterator() : _pointer(NULL) {}
 
@@ -41,7 +41,7 @@ class MapIterator {
 
     operator MapIterator<const T, Compare, Allocator>() const {
       return (MapIterator<const T, Compare, Allocator>(
-          _pointer, reinterpret_cast<Tree<const value_type, Compare, Allocator> const *>(_tree)));
+          _pointer, reinterpret_cast<RedBlackTree<const value_type, Compare, Allocator> const *>(_tree)));
     }
 
     bool operator==(MapIterator const &obj) {

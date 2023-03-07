@@ -1,19 +1,16 @@
-#include "map.hpp"
+#include <iostream>
+
+#if DEFAULT == 1
+
 #include <map>
 
+namespace ft = std;
 
-// int main() {
-//     ft::map<int, int> newmap;
-//     std::map<int, int> myMap;
+#else
 
-//     for(int i = 1; i < 10; i++) {
-//         myMap.insert(std::pair<int, int>(i, i));
-//     }
-//     for(int i = 1; i < 3000; i++) {
-//         newmap.insert(ft::pair<int, int>(i, i));
-//     }
-//     return 0;
-// }
+#include "map.hpp"
+
+#endif
 
 void testElementAccess() {
   std::cout << "TEST ELEMENT ACCESS [ ] and 'at'" << std::endl;
@@ -297,14 +294,14 @@ void testErase() {
 void testEraseRange() {
   ft::map<char, std::string> map;
 
-  map['a'] = "anderson";
-  map['b'] = "bruno";
-  map['c'] = "camila";
+  map['a'] = "alef";
+  map['b'] = "brenda";
+  map['c'] = "carla";
   map['d'] = "daniel";
-  map['e'] = "eduarda";
-  map['f'] = "fabiano";
-  map['g'] = "gabriela";
-  map['h'] = "helena";
+  map['e'] = "evageline";
+  map['f'] = "fatima";
+  map['g'] = "gabriel";
+  map['h'] = "helga";
 
   ft::map<char, std::string>::iterator it = map.begin();
   it++;
@@ -314,26 +311,26 @@ void testEraseRange() {
 
   map.erase(it, it2);
 
-//   ft::map<char, std::string>::iterator afterIt = map.begin();
-//   ft::map<char, std::string>::iterator afterEndIt = map.end();
+  ft::map<char, std::string>::iterator afterIt = map.begin();
+  ft::map<char, std::string>::iterator afterEndIt = map.end();
 
-//   while (afterIt != afterEndIt) {
-//     std::cout << "map.begin chave = " << afterIt->first << std::endl;
-//     std::cout << "map.begin valor = " << afterIt->second << std::endl;
-//     afterIt++;
-//   }
+  while (afterIt != afterEndIt) {
+    std::cout << "map.begin chave = " << afterIt->first << std::endl;
+    std::cout << "map.begin valor = " << afterIt->second << std::endl;
+    afterIt++;
+  }
 }
 
 void testSwap() {
   ft::map<float, std::string> map_1;
   ft::map<float, std::string> map_2;
 
-  map_1[1.1] = "Anderson_1";
-  map_1[2.2] = "bruno_1";
+  map_1[1.1] = "Alef_1";
+  map_1[2.2] = "Brenda_1";
 
-  map_2[1.1] = "Anderson_2";
-  map_2[2.2] = "bruno_2";
-  map_2[3.3] = "camila_2";
+  map_2[1.1] = "Alef_2";
+  map_2[2.2] = "Brenda_2";
+  map_2[3.3] = "Carla_2";
 
   std::cout << "Size of map 1 = " << map_1.size() << std::endl;
   std::cout << "Size of map 2 = " << map_2.size() << std::endl;
@@ -383,20 +380,20 @@ void testCount() {
 void testFind() {
   ft::map<int, std::string> map;
 
-  map[1] = "Frodo";
-  map[2] = "Sam";
-  map[3] = "Merry";
-  map[4] = "Pippin";
-  map[5] = "Gandalf";
-  map[6] = "Aragorn";
-  map[7] = "Legolas";
-  map[8] = "Gimli";
-  map[9] = "Boromir";
+  map[1] = "Sheldon";
+  map[2] = "Penny";
+  map[3] = "Leorand";
+  map[4] = "Howard";
+  map[5] = "Hagi";
+  map[6] = "Bernadette";
+  map[7] = "Amy";
+  map[8] = "Leslie";
+  map[9] = "Priya";
 
   ft::map<int, std::string>::iterator it = map.find(5);
 
-  std::cout << "Chave 5 ( Mithrandir ) = " << it->first << std::endl;
-  std::cout << "Valor 5 ( Mithrandir ) = " << it->second << std::endl;
+  std::cout << "Chave 5 ( Hagi ) = " << it->first << std::endl;
+  std::cout << "Valor 5 ( Hagi ) = " << it->second << std::endl;
 
   it = map.find(42);
 
@@ -407,7 +404,7 @@ void testFind() {
   ft::map<int, std::string>::const_iterator constIt = map.find(5);
   ft::map<int, std::string>::const_iterator constEndIt = map.end();
 
-  std::cout << "Sociedade do Anel A Partir do Iterador 'Olórin'" << std::endl;
+  std::cout << "The Big Bang Theory primeiros integrantes" << std::endl;
   while (constIt != constEndIt) {
     std::cout << "Chave = " << constIt->first << std::endl;
     std::cout << "Valor = " << constIt->second << std::endl;
@@ -417,7 +414,7 @@ void testFind() {
   ft::map<int, std::string>::reverse_iterator reverseIt = map.rbegin();
   ft::map<int, std::string>::reverse_iterator reverseEndIt = map.rend();
 
-  std::cout << "Sociedade do Anel A Partir do Iterador 'Boromir'" << std::endl;
+  std::cout << "The Big Bang Theory novos integrantes" << std::endl;
 
   while (reverseIt != reverseEndIt) {
     std::cout << "Chave = " << reverseIt->first << std::endl;
@@ -430,15 +427,15 @@ void testFind() {
 void testEqualRange() {
   ft::map<int, std::string> map;
 
-  map[1] = "Frodo";
-  map[2] = "Sam";
-  map[3] = "Merry";
-  map[4] = "Pippin";
-  map[5] = "Gandalf";
-  map[6] = "Aragorn";
-  map[7] = "Legolas";
-  map[8] = "Gimli";
-  map[9] = "Boromir";
+  map[1] = "Sheldon";
+  map[2] = "Penny";
+  map[3] = "Leorand";
+  map[4] = "Howard";
+  map[5] = "Hagi";
+  map[6] = "Bernadette";
+  map[7] = "Amy";
+  map[8] = "Leslie";
+  map[9] = "Priya";
 
   ft::pair<ft::map<int, std::string>::iterator, ft::map<int, std::string>::iterator> ret;
 
@@ -471,15 +468,15 @@ void testEqualRange2() {
 void testConstEqualRange() {
   ft::map<int, std::string> map;
 
-  map[1] = "Frodo";
-  map[2] = "Sam";
-  map[3] = "Merry";
-  map[4] = "Pippin";
-  map[5] = "Gandalf";
-  map[6] = "Aragorn";
-  map[7] = "Legolas";
-  map[8] = "Gimli";
-  map[9] = "Boromir";
+  map[1] = "Sheldon";
+  map[2] = "Penny";
+  map[3] = "Leorand";
+  map[4] = "Howard";
+  map[5] = "Hagi";
+  map[6] = "Bernadette";
+  map[7] = "Amy";
+  map[8] = "Leslie";
+  map[9] = "Priya";
 
   ft::pair<ft::map<int, std::string>::const_iterator, ft::map<int, std::string>::const_iterator>
       ret;
@@ -494,7 +491,7 @@ void testConstEqualRange() {
 
   ft::map<int, std::string>::const_iterator constIt = map.begin();
 
-  std::cout << "Sociedade do Anel A Partir do Iterador 'Olórin'" << std::endl;
+  std::cout << "The Big Bang Theory" << std::endl;
   while (constIt != map.end()) {
     std::cout << "Chave = " << constIt->first << std::endl;
     std::cout << "Valor = " << constIt->second << std::endl;
@@ -545,23 +542,16 @@ void testKeyComp() {
   map['y'] = 2002;
   map['z'] = 3003;
 
-  // Create a key comparer using the map's key_comp() function
   ft::map<char, int>::key_compare mycomp = map.key_comp();
 
   std::cout << "map contains:" << std::endl;
-
-  // Get the key value of the last element in the map
   char highest = map.rbegin()->first;
 
-  // Create an iterator pointing to the first element in the map
   ft::map<char, int>::iterator it = map.begin();
-
-  // Iterate through each element in the map
   do {
-    // Print out the element's key and value
     std::cout << it->first << " => " << it->second << std::endl;
   } while (mycomp((*it++).first,
-                  highest)); // The loop breaks when the current element's key is equal to the highest key.
+                  highest));
 
   std::cout << std::endl;
   std::cout << "---------------------------------" << std::endl;

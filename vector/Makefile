@@ -12,7 +12,7 @@ SRC        = main.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $(<:%.cpp=%_ft.o)
 
 %_std.o: %.cpp
-	$(CC) $(CFLAGS) $(INCLUDE) -DDEFAULT=1 -c $< -o $(<:%.cpp=%_std.o)
+	$(CC) $(CFLAGS) $(INCLUDE) -DEFAULT=1 -c $< -o $(<:%.cpp=%_std.o)
 
 all: $(EXEC) $(EXEC2)
 
@@ -30,7 +30,7 @@ $(EXEC): $(OBJ_FT)
 	$(CC) $(CFLAGS) $(OBJ_FT) -o $(EXEC)
 
 $(EXEC2): $(OBJ_STD)
-	$(CC) $(CFLAGS) $(OBJ_STD) -DDEFAULT=1 -o $(EXEC2)
+	$(CC) $(CFLAGS) $(OBJ_STD) -DEFAULT=1 -o $(EXEC2)
 
 clean:
 	rm -rf $(OBJ_STD) $(OBJ_FT)

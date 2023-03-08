@@ -1,4 +1,5 @@
 #include <iostream>
+#include "../map/mapTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -631,7 +632,7 @@ void testSlowOperation() {
   std::cout << "---------------------------------" << std::endl;
 }
 
-int main() {
+void mapTestes() {
   testElementAccess();
   testBeginIterator();
   testEndIterator();
@@ -658,5 +659,4 @@ int main() {
   testValueComp();
   testsOperator();
   testSlowOperation();
-  return 0;
 }

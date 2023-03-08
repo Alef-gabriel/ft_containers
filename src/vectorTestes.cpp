@@ -1,4 +1,5 @@
 #include <iostream>
+#include "../vector/vectorTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -419,7 +420,7 @@ void testVectorCompares() {
   testComparesGreaterEqual(ft_vector1, ft_vector2);
 }
 
-int main() {
+void vectorTestes () {
   testVectorSlowOperation();
   testVectorOperatorEqual();
   testAssignIntVector();
@@ -437,5 +438,4 @@ int main() {
   testVectorSwap();
   testVectorCompares();
   testVectorClear();
-  return 0;
 }

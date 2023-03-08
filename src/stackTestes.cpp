@@ -1,4 +1,5 @@
 #include <iostream>
+#include "../stack/stackTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -160,11 +161,10 @@ void testsNoMemberFunctions() {
   std::cout << "\t-----\t-----\t-----\t" << std::endl;
 }
 
-int main() {
+void stackTestes() {
   testsStackSlowOperation();
   testCopyUsingEqual();
   testsCapacity();
   testsPush();
   testsPop();
-  return 0;
 }

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../map/mapTestes.hpp"
+#include "../includes/map/mapTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -9,7 +9,7 @@ namespace ft = std;
 
 #else
 
-#include "map.hpp"
+#include "../includes/map/map.hpp"
 
 #endif
 

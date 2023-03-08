@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../stack/stackTestes.hpp"
+#include "../includes/stack/stackTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -9,7 +9,7 @@ namespace ft = std;
 
 #else
 
-#include "stack.hpp"
+#include "../includes/stack/stack.hpp"
 
 #endif
 

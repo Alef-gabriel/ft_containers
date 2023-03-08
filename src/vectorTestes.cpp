@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../vector/vectorTestes.hpp"
+#include "../includes/vector/vectorTestes.hpp"
 
 #if DEFAULT == 1
 
@@ -8,7 +8,7 @@ namespace ft = std;
 
 #else
 
-#include "vector.hpp"
+#include "../includes/vector/vector.hpp"
 #endif
 
 

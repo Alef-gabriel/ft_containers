@@ -1,12 +1,21 @@
-EXEC    = ft_stack
-EXEC2    = std_stack
+EXEC    = ft_test
+EXEC2    = std_test
 NAME = $(EXEC)
 NAME2 = $(EXEC2)
 
 CC      = g++
 CFLAGS    = -g -Wall -Wextra -Werror -std=c++98
-INCLUDE =    -I ./
-SRC        = main.cpp
+INCLUDE = $(addprefix -I ./includes, \
+			/. \
+			/stack \
+			/vector \
+			/map )
+
+SRC = $(addprefix ./src/, \
+          	main.cpp \
+          	mapTestes.cpp \
+          	stackTestes.cpp \
+          	vectorTestes.cpp)
 
 %_ft.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $(<:%.cpp=%_ft.o)

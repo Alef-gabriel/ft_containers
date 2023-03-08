@@ -24,7 +24,7 @@ public:
     }
 
     node_type *insert(const key_type &value) {
-        node_type *res;
+        node_type *res = NULL;
         if (root) {
             while (root) {
                 if (value.first < root->value->first) {
